@@ -1,0 +1,53 @@
+{
+  "appName": {
+    "message": "eBesucher Addon"
+  },
+  "appDesc": {
+    "message": "Entdecke neue Webseiten und verdiene Geld mit dem eBesucher Add-on"
+  },
+  "urlEbesucher": {
+    "message": "https://www.ebesucher.de"
+  },
+  "urlBuyPoints": {
+    "message": "https://www.ebesucher.de/werbung/buchen"
+  },
+  "urlInfo": {
+    "message": "https://www.ebesucher.de/faq/wie-kann-ich-mehr-verdienen"
+  },
+  "urlLogin": {
+    "message": "https://www.ebesucher.de/login"
+  },
+  "urlManageCampaigns": {
+    "message": "https://www.ebesucher.de/werbung/verwalten"
+  },
+  "errorUserNotExist": {
+    "message": "Dieser Nutzer existiert nicht!"
+  },
+  "errorUserIsEmpty": {
+    "message": "Der Nutzername darf nicht leer sein"
+  },
+  "username": {
+    "message": "Nutzername"
+  },
+  "openSurfbar": {
+    "message": "Surfbar starten"
+  },
+  "openClickAd": {
+    "message": "Klick-Anzeigen besuchen"
+  },
+  "manageCampaigns": {
+    "message": "Meine Werbekampagnen"
+  },
+  "login": {
+    "message": "Login Mitgliederbereich"
+  },
+  "clickAdsClicked": {
+    "message": "Anzahl Klicks"
+  },
+  "surfbarTime": {
+    "message": "Zeit in Surfbar"
+  },
+  "today": {
+    "message": "Heute"
+  }
+}

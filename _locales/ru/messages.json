@@ -1,0 +1,53 @@
+{
+  "appName": {
+    "message": "eBesucher Addon"
+  },
+  "appDesc": {
+    "message": "Discover new websites and get paid with the eBesucher add-on"
+  },
+  "urlEbesucher": {
+    "message": "https://www.ebesucher.ru"
+  },
+  "urlBuyPoints": {
+    "message": "https://www.ebesucher.com/advertising/order"
+  },
+  "urlInfo": {
+    "message": "https://www.ebesucher.com/faq/how-can-i-earn-more"
+  },
+  "urlLogin": {
+    "message": "https://www.ebesucher.ru/login"
+  },
+  "urlManageCampaigns": {
+    "message": "https://www.ebesucher.ru/werbung/verwalten"
+  },
+  "errorUserNotExist": {
+    "message": "Пользователь не существует"
+  },
+  "errorUserIsEmpty": {
+    "message": "Имя пользователя отсутствует"
+  },
+  "username": {
+    "message": "Имя пользователя"
+  },
+  "openSurfbar": {
+    "message": "Запустить автосёрфинг"
+  },
+  "openClickAd": {
+    "message": "Смотреть объявления-клики"
+  },
+  "manageCampaigns": {
+    "message": "Мои рекламные кампании"
+  },
+  "login": {
+    "message": "Вход в раздел для пользователя"
+  },
+  "clickAdsClicked": {
+    "message": "Количество кликов"
+  },
+  "surfbarTime": {
+    "message": "Время в автосёрфинге"
+  },
+  "today": {
+    "message": "сегодня"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<!--needed for chrome-->
+<html class="min-width">
+<head>
+    <meta charset="utf-8">
+    <link href="popup.css" rel="stylesheet"/>
+    <link href="/lib/css/font-awesome.min.css" rel="stylesheet">
+    <script src="/lib/js/jquery-3.3.1.min.js"></script>
+</head>
+
+<!--needed for firefox-->
+<body class="min-width">
+
+<div id="wrapper">
+    <div id="left">
+        <input type="text" id="username" class="input-field" autocomplete="off">
+        <div class="error-text"></div>
+    </div>
+    <div id="right">
+        <a id="link-info" href="#"><i class="fa fa-3x fa-lg fa-info-circle font-color-default"></i></a>
+    </div>
+</div>
+
+<div class="row">
+    <span><button type="button" id="btn-open-surfbar" class="btn btn-default "><i class="fa v-align-middle fa-refresh" style="font-size: 20px;"></i> </span>
+    <span class="v-align-middle" >__MSG_openSurfbar__</span></button>
+</div>
+
+<div class="row">
+    <button type="button" id="btn-open-clickad" class="btn btn-default "><i class="fa v-align-middle fa-mouse-pointer" style="font-size: 20px;"></i> <span
+            class="v-align-middle">__MSG_openClickAd__</span></button>
+</div>
+
+<div class="row">
+    <button type="button" id="btn-open-login" class="btn btn-success "><i class="fa v-align-middle fa-user" style="font-size: 20px;"></i> <span
+            class="v-align-middle">__MSG_login__</span></button>
+</div>
+
+<div class="row">
+    <button type="button" id="btn-open-manage-campaigns" class="btn btn-success "><i class="fa v-align-middle fa-list-alt" style="font-size: 20px;"></i> <span
+            class="v-align-middle">__MSG_manageCampaigns__</span></button>
+</div>
+
+<div class="row statistics">
+    <div class="font-small">__MSG_surfbarTime__</div>
+    <div class="font-big" id="statistic-surfbar"></div>
+</div>
+
+<div class="row statistics">
+    <div class="font-small">__MSG_clickAdsClicked__</div>
+    <div class="font-big" id="statistic-clickads"></div>
+</div>
+
+
+<script src="popupData.js"></script>
+<script src="/util/helper.js"></script>
+<script src="/util/web-ext-helper.js"></script>
+<script src="popup.js"></script>
+<script src="/_locales/localizeHtmlPage.js"></script>
+
+</body>
+
+</html>

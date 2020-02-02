@@ -1,0 +1,53 @@
+{
+  "appName": {
+    "message": "eBesucher Addon"
+  },
+  "appDesc": {
+    "message": "Descubre nuevos sitios web y gana dinero con el complemento de eBesucher"
+  },
+  "urlEbesucher": {
+    "message": "https://www.ebesucher.es"
+  },
+  "urlBuyPoints": {
+    "message": "https://www.ebesucher.es/publicidad/comprar"
+  },
+  "urlInfo": {
+    "message": "https://www.ebesucher.es/faq/-como-puedo-ganar-mas-dinero"
+  },
+  "urlLogin": {
+    "message": "https://www.ebesucher.es/login"
+  },
+  "urlManageCampaigns": {
+    "message": "https://www.ebesucher.es/werbung/verwalten"
+  },
+  "errorUserNotExist": {
+    "message": "El usuario no existe!"
+  },
+  "errorUserIsEmpty": {
+    "message": "El nombre de usuario está vacío"
+  },
+  "username": {
+    "message": "Nombre de usuario"
+  },
+  "openSurfbar": {
+    "message": "Iniciar la barra de surf"
+  },
+  "openClickAd": {
+    "message": "Visitar anuncios por clic"
+  },
+  "manageCampaigns": {
+    "message": "Mis campañas"
+  },
+  "login": {
+    "message": "Acceso de usuario"
+  },
+  "clickAdsClicked": {
+    "message": "Número de clics"
+  },
+  "surfbarTime": {
+    "message": "Tiempo de surf"
+  },
+  "today": {
+    "message": "Hoy"
+  }
+}
