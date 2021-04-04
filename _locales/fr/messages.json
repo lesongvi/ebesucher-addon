@@ -47,7 +47,22 @@
   "surfbarTime": {
     "message": "Temps de surf"
   },
-  "since": {
+  "today": {
     "message": "Aujourd'hui"
+  },
+  "privacy": {
+    "message": "Confidentialité"
+  },
+  "privacyText": {
+    "message": "J'accepte l'utilisation de tous les cookies facultatifs à des fins d'analyse Web et de marketing et je souhaite que les consentements aux cookies correspondants soient automatiquement confirmés avec ces informations pour les sites dans la surfbar et les annonces clics."
+  },
+  "hint": {
+    "message": "Remarque"
+  },
+  "hintCookieText": {
+    "message": "si vous n'acceptez pas les cookies, vous ne verrez que le contenu qui fonctionne sans cookies."
+  },
+  "management": {
+    "message": "Administration"
   }
 }

@@ -33,13 +33,21 @@ let Surfbar = function (type) {
 
     this.earnedTaskPoints = 0;
 
-    this.tasksShown = false;
+    this.isTasksShown = false;
 
     this.confirmTasksForViewUrl = null;
 
     this.isShownOnce = false;
 
     this.isOneTaskClicked = false;
+
+    this.isSameHostName = false;
+
+    this.cookieConsentSelectors = null;
+
+    this.customAction = null;
+
+    this.hasExecutedCustomAction = false;
 };
 
 Surfbar.prototype = {

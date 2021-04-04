@@ -11,21 +11,6 @@ window.addEventListener("message", (event) => {
         "https://www.ebesucher.es",
         "https://www.ebesucher.fr",
 
-        "http://testserver.ebesucher.de",
-        "http://testserver.ebesucher.eu",
-        "http://testserver.ebesucher",
-        "http://en.testserver.ebesucher",
-        "http://es.testserver.ebesucher",
-        "http://fr.testserver.ebesucher",
-        "http://ru.testserver.ebesucher",
-        "https://testserver.ebesucher.de",
-        "https://testserver.ebesucher.eu",
-        "https://testserver.ebesucher",
-        "https://en.testserver.ebesucher",
-        "https://es.testserver.ebesucher",
-        "https://fr.testserver.ebesucher",
-        "https://ru.testserver.ebesucher",
-
         "http://ebesucher.dev.proxy",
         "http://en.ebesucher.dev.proxy",
         "http://es.ebesucher.dev.proxy",
@@ -58,14 +43,48 @@ window.addEventListener("message", (event) => {
         "https://es.dev.ebesucher.de",
         "https://fr.dev.ebesucher.de",
         "https://ru.dev.ebesucher.de",
+
+        "http://int.ebesucher.de",
+        "http://en.int.ebesucher.de",
+        "http://es.int.ebesucher.de",
+        "http://fr.int.ebesucher.de",
+        "http://ru.int.ebesucher.de",
+        "https://int.ebesucher.de",
+        "https://en.int.ebesucher.de",
+        "https://es.int.ebesucher.de",
+        "https://fr.int.ebesucher.de",
+        "https://ru.int.ebesucher.de",
+
+        "http://dev.npk.ebesucher.de",
+        "http://en.dev.npk.ebesucher.de",
+        "http://es.dev.npk.ebesucher.de",
+        "http://ru.dev.npk.ebesucher.de",
+        "https://dev.npk.ebesucher.de",
+        "https://en.dev.npk.ebesucher.de",
+        "https://es.dev.npk.ebesucher.de",
+        "https://ru.dev.npk.ebesucher.de",
+
+        "http://int.npk.ebesucher.de",
+        "http://en.int.npk.ebesucher.de",
+        "http://es.int.npk.ebesucher.de",
+        "http://ru.int.npk.ebesucher.de",
+        "https://int.npk.ebesucher.de",
+        "https://en.int.npk.ebesucher.de",
+        "https://es.int.npk.ebesucher.de",
+        "https://ru.int.npk.ebesucher.de",
+
+        "http://qa.npk.ebesucher.de",
+        "http://en.qa.npk.ebesucher.de",
+        "http://es.qa.npk.ebesucher.de",
+        "http://ru.qa.npk.ebesucher.de",
+        "https://qa.npk.ebesucher.de",
+        "https://en.qa.npk.ebesucher.de",
+        "https://es.qa.npk.ebesucher.de",
+        "https://ru.qa.npk.ebesucher.de",
     ];
 
     if (event.source !== window || !event.data || ($.inArray(event.origin, origins) === -1)) {
         return;
-    }
-
-    if (event.data.action === "startSurfbar") {
-        chrome.runtime.sendMessage({action: "startSurfbar", url: event.data.url, displayTime: event.data.displayTime});
     }
 
     if (event.data.action === "isAddonInstalled") {
@@ -103,6 +122,7 @@ window.addEventListener("message", (event) => {
                             complaintUrl: value.complaintUrl,
                             feedbackUrl: value.feedbackUrl,
                             forwardurl: value.forwardurl,
+                            customAction: value.customAction,
                             html: value.html,
                             name: value.name,
                             url: value.url,
@@ -156,4 +176,34 @@ window.addEventListener("message", (event) => {
             }, event.origin);
         });
     }
+
+    if (event.data.action === "getPopupData") {
+        chrome.runtime.sendMessage({
+            from: "website",
+            action: "getPopupData",
+            windowUrl: event.source.location.href
+        }, function (response) {
+            window.postMessage({
+                from: "addon",
+                action: "getPopupDataAnswer",
+                popupData: response.popupData
+            }, event.origin);
+        });
+    }
+
+    if (event.data.action === "getAdblockingAddons") {
+        chrome.runtime.sendMessage({
+            from: "website",
+            action: "getAdblockingAddons",
+            adBlockAddons: event.data.adBlockAddons,
+            windowUrl: event.source.location.href
+        }, function (response) {
+            window.postMessage({
+                from: "addon",
+                action: "getAdblockingAddonsAnswer",
+                adblockingAddons: response.adblockingAddons
+            }, event.origin);
+        });
+    }
+
 });

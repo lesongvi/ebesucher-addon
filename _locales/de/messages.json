@@ -49,5 +49,20 @@
   },
   "today": {
     "message": "Heute"
+  },
+  "privacy": {
+    "message": "Privatsphäre"
+  },
+  "privacyText": {
+    "message": "Ich akzeptiere die Verwendung von allen optionalen Cookies zum Zwecke von Webanalyse und Marketing und möchte dass entsprechende Cookie-Hinweise in der Surfbar und Klickanzeigen automatisch mit dieser Information bestätigt werden."
+  },
+  "hint": {
+    "message": "Hinweis"
+  },
+  "hintCookieText": {
+    "message": "wenn Sie keine Cookies akzeptieren, sehen Sie nur Inhalte die auch ohne Cookies funktionieren."
+  },
+  "management": {
+    "message": "Verwaltung"
   }
 }

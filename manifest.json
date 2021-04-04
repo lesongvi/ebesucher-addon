@@ -4,14 +4,14 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "manifest_version": 2,
-  "version": "1.0.28.4",
+  "version": "1.0.41",
   "author": "eBesucher",
   "homepage_url": "https://ebesucher.de",
   "icons": {
     "32": "resources/icons/logo-32x32.png",
     "64": "resources/icons/logo-64x64.png"
   },
-  "minimum_chrome_version" : "22.0.0.0",
+  "minimum_chrome_version": "22.0.0.0",
   "default_locale": "en",
   "background": {
     "scripts": [
@@ -32,29 +32,55 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "<all_urls>"
+      ],
       "js": [
         "lib/js/jquery-3.3.1.min.js",
+        "util/cookie-consent-accepter.js",
+        "util/helper.js",
+        "util/web-ext-helper.js",
         "ads/jackpot.js",
+        "popup/popup.js",
         "ads/ads-content-script.js"
       ],
       "run_at": "document_end"
     },
     {
-      "matches": ["<all_urls>"],
-      "js": ["ads/ads-webpage-listener.js", "util/helper.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "ads/ads-webpage-listener.js",
+        "util/helper.js",
+        "popup/popup.js",
+        "popup/popupData.js",
+        "util/web-ext-helper.js"
+      ]
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "ads/iframe.js"
+      ],
+      "all_frames": true
     }
   ],
   "permissions": [
     "activeTab",
     "storage",
     "tabs",
-    "webRequest",
+    "management",
     "*://ebesucher.de/*",
-    "*://testserver.ebesucher/*",
-    "*://ebesucher.dev.proxy/*",
-    "*://dev.ebesucher.de/*",
-    "*://qa.ebesucher.de/*",
+    
+    
+    
+    
+    
+    
+    
     "<all_urls>"
   ],
   "web_accessible_resources": [

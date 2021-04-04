@@ -28,6 +28,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         this.add404Listener();
     }
 
+    if (request.action === "updateSurfbar") {
+        let surfbar = request.surfbar;
+
+        if (isSurfbarAd(surfbar.type)) {
+            activeSurfbar.cookieConsentSelectors = surfbar.cookieConsentSelectors
+            activeSurfbar.hasExecutedCustomAction = surfbar.hasExecutedCustomAction
+        }
+
+        if (isClickAd(surfbar.type)) {
+            let surfbarTabId = surfbar.tabId;
+            let clickAdSurfbar = clickAdsSurfbarArray[surfbarTabId];
+            if (clickAdSurfbar === undefined) {
+                return;
+            }
+            clickAdSurfbar.isSameHostName = surfbar.isSameHostName;
+            clickAdSurfbar.isTasksShown = surfbar.isTasksShown;
+            clickAdSurfbar.currentPage = surfbar.currentPage;
+            clickAdSurfbar.cookieConsentSelectors = surfbar.cookieConsentSelectors;
+            clickAdSurfbar.hasExecutedCustomAction = surfbar.hasExecutedCustomAction
+
+            clickAdsSurfbarArray[surfbarTabId] = clickAdSurfbar;
+        }
+    }
+
     if (request.from === "ads-view" && request.action === "countdownFinished") {
         let surfbar = request.surfbar;
 
@@ -135,8 +159,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.from === "website" && request.action === "showAds") {
         let surfbar = new Surfbar(request.type);
         let params = request.params;
+
         surfbar.params = params;
         surfbar.frameCss = request.frameCss;
+        surfbar.cookieConsentSelectors = initClickedCookieConsentSelectors(params.cookieConsentSelectors);
 
         if (isClickAd(surfbar.type)) {
             surfbar.forwardurl = params.forwardurl;
@@ -150,6 +176,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             surfbar.tabId = params.currentTabId;
             surfbar.redirectTime = request.redirectTime;
             surfbar.complaintUrl = params.complaintUrl;
+            surfbar.currentPage = params.realurl;
+            surfbar.customAction = params.customAction;
 
             if (!$.isEmptyObject(params.tasks)) {
                 surfbar.tasks = params.tasks.tasks;
@@ -195,6 +223,46 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 sendResponse({tabId: tabs[0].id});
             }
         });
+        return true;
+    }
+
+    if (request.from === "website" && request.action === "getPopupData") {
+        getStorageData("popupData").then(function (popupData) {
+            if (!popupData) {
+                popupData = new PopupData();
+            }
+
+            sendResponse({popupData: popupData});
+        });
+
+        return true;
+    }
+
+    if (request.from === "website" && request.action === "getAdblockingAddons") {
+        let adBlockAddons = request.adBlockAddons;
+        let result = [];
+
+        chrome.management.getAll(function (installedAddons) {
+            for (let [_, installedAddon] of Object.entries(installedAddons)) {
+                if (!installedAddon.enabled) {
+                    continue;
+                }
+
+                for (let [_, adBlockAddon] of Object.entries(adBlockAddons)) {
+                    let isAdBlockAddon = installedAddon.name.toLowerCase().search(adBlockAddon.toLowerCase()) >= 0;
+                    if (isAdBlockAddon) {
+                        let addonData = {
+                            "id": installedAddon.id,
+                            "name": installedAddon.name
+                        };
+                        result.push(addonData);
+                    }
+                }
+            }
+
+            sendResponse({adblockingAddons: result});
+        });
+
         return true;
     }
 
@@ -250,13 +318,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         clickAdsSurfbarArray[surfbarTabId] = clickAdSurfbar;
     }
 
-    if (request.from === "jackpot" && request.action === "updateTasksShown") {
+    if (request.from === "jackpot" && request.action === "updateIsTasksShown") {
         let surfbarTabId = request.surfbar.tabId;
         let clickAdSurfbar = clickAdsSurfbarArray[surfbarTabId];
         if (clickAdSurfbar === undefined) {
             return;
         }
-        clickAdSurfbar.tasksShown = true;
+        clickAdSurfbar.isTasksShown = true;
         clickAdsSurfbarArray[surfbarTabId] = clickAdSurfbar;
     }
 
@@ -284,16 +352,26 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         sendResponse({surfbarExists: surfbarExists});
     }
 
+    if (request.from === "cookie-consent-accepter" && request.action === "sendMsgToIframe") {
+        chrome.tabs.sendMessage(request.surfbar.tabId, {
+            from: "background",
+            action: "cookieConsentAccepter",
+            surfbar: request.surfbar
+        });
+    }
+
 });
 
 
 function initAdBox(surfbar, callback) {
     if (!surfbar.isShownOnce || surfbar.displayTime > 15) {
-        chrome.tabs.sendMessage(surfbar.tabId, {
-            from: "background",
-            action: "initAdsBox",
-            surfbar: surfbar
-        }, callback);
+        setTimeout(function () {
+            chrome.tabs.sendMessage(surfbar.tabId, {
+                from: "background",
+                action: "initAdsBox",
+                surfbar: surfbar
+            }, callback);
+        }, 100);
     }
 }
 
@@ -315,7 +393,6 @@ function initClickAd(surfbar) {
                         console.debug(lastError);
                     }
 
-                    surfbar.isShownOnce = true;
                     clickAdsSurfbarArray[surfbar.tabId] = surfbar;
 
                     console.debug("Initialized Ad Box");
@@ -341,6 +418,7 @@ function initSurfbarAd(surfbar) {
     surfbar.displayHtml = site.html;
     surfbar.complaintUrl = site.complaintUrl;
     surfbar.feedbackUrl = site.feedbackUrl;
+    surfbar.customAction = site.customAction;
 
     surfbar.startDate = new Date().toJSON();
 
@@ -473,4 +551,13 @@ function resetSurfbar() {
     surfbarExists = false;
     timePassedInSeconds = 0;
     checkSiteRespondingCount = 0;
+}
+
+function initClickedCookieConsentSelectors(cookieConsentSelectors) {
+    let result = {};
+    for (let i = 0; i < cookieConsentSelectors.length; i++) {
+        result[cookieConsentSelectors[i]] = false;
+    }
+
+    return result;
 }

@@ -8,25 +8,35 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.from === "background" && request.action === "initAdsBox") {
         surfbar = request.surfbar;
 
+        if (isClickAd(surfbar.type)) {
+            surfbar.isSameHostName = isSameHostName(surfbar.currentPage, window.location.hostname);
+            surfbar.isShownOnce = true;
+
+            chrome.runtime.sendMessage({action: "updateSurfbar", surfbar: surfbar});
+        }
+
         let surfbarNotExists = $("#" + surfbar.surfbarId).length === 0;
-
         if (surfbarNotExists) {
-            insertAdsBox(surfbar);
-            updateView(surfbar);
+            handleCustomAction(surfbar);
 
-            if (isClickAd(surfbar.type)) {
-                if (surfbar.displayTime === 15) {
-                    this.sendFinishMessage(surfbar);
-                    return;
-                } else {
-                    countdownIsRunning = true;
+            setTimeout(function () {
+                insertAdsBox(surfbar);
+                updateView(surfbar);
+
+                if (isClickAd(surfbar.type)) {
+                    if (surfbar.displayTime === 15) {
+                        this.sendFinishMessage(surfbar);
+                        return;
+                    } else {
+                        countdownIsRunning = true;
+                    }
                 }
-            }
 
-            if (countdownIsRunning || isSurfbarAd(surfbar.type)) {
-                console.debug("Starting Countdown");
-                startCountdown();
-            }
+                if (countdownIsRunning || isSurfbarAd(surfbar.type)) {
+                    console.debug("Starting Countdown");
+                    startCountdown();
+                }
+            }, 1000);
         }
     }
 
@@ -83,6 +93,7 @@ function insertAdsBox(surfbar) {
         $("html").append(div);
 
         initClickListener(surfbar);
+        acceptCookieConsent();
 
         let surfbarExists = $("#" + surfbar.surfbarId).length !== 0;
         if (tries > 10 || surfbarExists) {
@@ -178,6 +189,61 @@ function isClickAd(type) {
 
 function isSurfbarAd(type) {
     return type && type === "surfbarAd";
+}
+
+function isSameHostName(realUrl, currentHostname) {
+    let hostnameOfRealurl = this.extractHostname(realUrl);
+
+    return hostnameOfRealurl === currentHostname;
+}
+
+function extractHostname(url) {
+    let hostname;
+
+    if (url.indexOf("//") > -1) {
+        hostname = url.split('/')[2];
+    } else {
+        hostname = url.split('/')[0];
+    }
+
+    hostname = hostname.split(':')[0];
+
+    hostname = hostname.split('?')[0];
+
+    return hostname;
+}
+
+async function handleCustomAction(surfbarLocal) {
+    let popupData = await getPopupData();
+    if (!popupData.acceptedCookies || surfbarLocal.hasExecutedCustomAction) {
+        return;
+    }
+
+    let customAction = surfbarLocal.customAction;
+    if (customAction === "followFirstLink") {
+        let url = document.querySelector("a");
+        console.debug(`Custom Action: ${customAction}; Following url: ${url}`);
+
+        surfbarLocal.hasExecutedCustomAction = true;
+        chrome.runtime.sendMessage({action: "updateSurfbar", surfbar: surfbarLocal}, function (response) {
+            let lastError = chrome.runtime.lastError;
+
+            url.click();
+        });
+    }
+
+    if (customAction === "youtubeRedirectUrl") {
+        let url = document.querySelector("#invalid-token-redirect-goto-site-button");
+        console.debug(`Custom Action: ${customAction}; Following url: ${url}`);
+
+        surfbarLocal.hasExecutedCustomAction = true;
+        chrome.runtime.sendMessage({action: "updateSurfbar", surfbar: surfbarLocal}, function (response) {
+            let lastError = chrome.runtime.lastError;
+
+            url.click();
+        });
+    }
+
 }
 
 $(document).ready(function () {

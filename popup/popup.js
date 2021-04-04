@@ -1,11 +1,15 @@
 $(document).ready(function () {
-    let usernameNode = $("#username");
+    let usernameNode = $("#addon-username");
     usernameNode.attr("placeholder", chrome.i18n.getMessage("username"));
     usernameNode.focus();
 
     restoreOptions();
+
     initializeButtonListener();
+    initializeCheckboxListener();
+    initUsernameListener();
 });
+
 
 function initializeButtonListener() {
 
@@ -29,19 +33,43 @@ function initializeButtonListener() {
         openUrl(chrome.i18n.getMessage("urlManageCampaigns"));
     });
 
+    $("#accept-cookies").click(async function () {
+        let popupData = await getPopupData();
+        popupData.acceptedCookies = $(this).is(':checked');
+        chrome.storage.local.set({"popupData": popupData});
+    });
+
+    $("#link-login").click(function () {
+        openUrl(chrome.i18n.getMessage("urlLogin"));
+    })
+
+    $("#link-manage-campaigns").click(function () {
+        openUrl(chrome.i18n.getMessage("urlManageCampaigns"));
+    })
+
     console.debug("Initialized Button Listener");
 }
 
+function initializeCheckboxListener() {
+    $('#accept-cookies').change(function () {
+        handleUpdateCheckbox($(this).is(':checked'));
+    });
+}
+
+function initUsernameListener() {
+    $("#addon-username").on("paste keyup", function () {
+        updateUsername($(this).val());
+    });
+}
+
 async function openSurfbar() {
-    let usernameNode = $("#username");
+    let usernameNode = $("#addon-username");
     let username = usernameNode.val();
 
     if (username) {
         removeError(usernameNode);
 
-        let popupData = await getPopupData();
-        popupData.username = username;
-        chrome.storage.local.set({"popupData": popupData});
+        await this.updateUsername(username);
 
         chrome.runtime.sendMessage({action: "getActiveSurfbar"}, function (response) {
             let surfbar = response.activeSurfbar;
@@ -59,7 +87,7 @@ async function openSurfbar() {
 }
 
 function openRandomClickAd() {
-    let usernameNode = $("#username");
+    let usernameNode = $("#addon-username");
     let username = usernameNode.val();
 
     if (username) {
@@ -91,7 +119,6 @@ function openRandomClickAd() {
 }
 
 
-
 function openUrl(url) {
     chrome.tabs.create({url: url});
     window.close();
@@ -111,6 +138,7 @@ function restoreOptions() {
         if (createdAt < yesterday) {
             popupData.clickedClickAds = 0;
             popupData.surfbarTime = 0;
+            popupData.acceptedCookies = result.popupData.acceptedCookies;
 
             let todayAtMidnight = new Date();
             todayAtMidnight.setHours(0, 0, 0, 0);
@@ -118,13 +146,16 @@ function restoreOptions() {
             chrome.storage.local.set({"popupData": popupData});
         }
 
-        $("#username").val(popupData.username);
+        $("#addon-username").val(popupData.username);
         $("#statistic-clickads").text(popupData.clickedClickAds);
         $("#statistic-surfbar").text(formatTime(popupData.surfbarTime));
+        $("#accept-cookies").prop('checked', popupData.acceptedCookies);
 
         $(".row.statistics").each(function (key, node) {
             $(node).prop('title', chrome.i18n.getMessage('today'));
         });
+
+        handleUpdateCheckbox(popupData.acceptedCookies);
 
         console.debug("Restored Options");
     });
@@ -160,5 +191,33 @@ function formatTime(timeInSeconds) {
     let formattedMinute = minute < 10 ? addLeadingZeros(minute, 2) : minute;
 
     return formattedMinute + ":" + addLeadingZeros(seconds, 2);
+}
+
+function handleUpdateCheckbox(isChecked) {
+    if (isChecked) {
+        enableButton($('#btn-open-surfbar'));
+        enableButton($('#btn-open-clickad'));
+        $('#accept-cookies-hint').hide();
+    } else {
+        disableButton($('#btn-open-surfbar'));
+        disableButton($('#btn-open-clickad'));
+        $('#accept-cookies-hint').show();
+    }
+}
+
+function enableButton(btn) {
+    $(btn).removeClass("btn-default");
+    $(btn).addClass("btn-primary");
+}
+
+function disableButton(btn) {
+    $(btn).addClass("btn-default");
+    $(btn).removeClass("btn-primary");
+}
+
+async function updateUsername(username) {
+    let popupData = await getPopupData();
+    popupData.username = username;
+    chrome.storage.local.set({"popupData": popupData});
 }
 

@@ -49,5 +49,20 @@
   },
   "today": {
     "message": "Today"
+  },
+  "privacy": {
+    "message": "Privacy"
+  },
+  "privacyText": {
+    "message": "I accept the use of all optional cookies for the purpose of web analysis and marketing and would like the corresponding cookie consents to be automatically confirmed with this information for sites in the surfbar and click ads."
+  },
+  "hint": {
+    "message": "Hint"
+  },
+  "hintCookieText": {
+    "message": "if you do not accept cookies, you will only see content that works without cookies."
+  },
+  "management": {
+    "message": "Administration"
   }
 }
