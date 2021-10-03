@@ -15,7 +15,7 @@ function acceptCookieConsentIframe(surfbar) {
             surfbar.cookieConsentSelectors[cookieConsentSelector] = true;
             chrome.runtime.sendMessage({action: "updateSurfbar", surfbar: surfbar});
 
-            console.error('Clicking cookie consent selector in iFrame: ' + cookieConsentSelector);
+            console.debug('Clicking cookie consent selector in iFrame: ' + cookieConsentSelector);
             item.click();
         } catch (e) {
         }

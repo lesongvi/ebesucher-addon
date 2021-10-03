@@ -169,7 +169,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             surfbar.realurl = params.url;
             surfbar.displayTime = params.viewtime;
             surfbar.timeLeft = params.viewtime;
-            surfbar.displayHtml = request.html;
+            surfbar.params.eigenverdienst = request.params.earnedcredit;
+            surfbar.displayHtml = params.viewtime <= 15 ? request.html : addonSurfbar();
             surfbar.parentTabId = params.parentTabId;
             surfbar.startDate = new Date().toJSON();
 
@@ -402,6 +403,25 @@ function initClickAd(surfbar) {
     }, surfbar.redirectTime);
 }
 
+function getToplevelDomain(domain) {
+    domain = new URL(domain).hostname.split('.')
+    return domain[domain.length - 1]
+}
+
+function formatByDomain(eigenverdienst, domain) {
+    domain = getToplevelDomain(domain)
+
+    if (domain != 'com') {
+        eigenverdienst = eigenverdienst.toString().replace('.', ',')
+    }
+
+    return eigenverdienst
+}
+
+function addonSurfbar() {
+    return `<div id="addon-surfbar"></div>`
+}
+
 function initSurfbarAd(surfbar) {
     console.debug("Initializing Surfbar Ad");
     timePassedInSeconds = 0;
@@ -415,7 +435,7 @@ function initSurfbarAd(surfbar) {
     surfbar.realurl = site.url;
     surfbar.displayTime = site.viewtime;
     surfbar.timeLeft = site.viewtime;
-    surfbar.displayHtml = site.html;
+    surfbar.displayHtml = addonSurfbar();
     surfbar.complaintUrl = site.complaintUrl;
     surfbar.feedbackUrl = site.feedbackUrl;
     surfbar.customAction = site.customAction;

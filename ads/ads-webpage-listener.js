@@ -55,32 +55,12 @@ window.addEventListener("message", (event) => {
         "https://fr.int.ebesucher.de",
         "https://ru.int.ebesucher.de",
 
-        "http://dev.npk.ebesucher.de",
-        "http://en.dev.npk.ebesucher.de",
-        "http://es.dev.npk.ebesucher.de",
-        "http://ru.dev.npk.ebesucher.de",
-        "https://dev.npk.ebesucher.de",
-        "https://en.dev.npk.ebesucher.de",
-        "https://es.dev.npk.ebesucher.de",
-        "https://ru.dev.npk.ebesucher.de",
-
-        "http://int.npk.ebesucher.de",
-        "http://en.int.npk.ebesucher.de",
-        "http://es.int.npk.ebesucher.de",
-        "http://ru.int.npk.ebesucher.de",
-        "https://int.npk.ebesucher.de",
-        "https://en.int.npk.ebesucher.de",
-        "https://es.int.npk.ebesucher.de",
-        "https://ru.int.npk.ebesucher.de",
-
-        "http://qa.npk.ebesucher.de",
-        "http://en.qa.npk.ebesucher.de",
-        "http://es.qa.npk.ebesucher.de",
-        "http://ru.qa.npk.ebesucher.de",
-        "https://qa.npk.ebesucher.de",
-        "https://en.qa.npk.ebesucher.de",
-        "https://es.qa.npk.ebesucher.de",
-        "https://ru.qa.npk.ebesucher.de",
+        "http://feat1.npk.ebesucher.de",
+        "http://feat2.npk.ebesucher.de",
+        "http://feat3.npk.ebesucher.de",
+        "https://feat1.npk.ebesucher.de",
+        "https://feat2.npk.ebesucher.de",
+        "https://feat3.npk.ebesucher.de"
     ];
 
     if (event.source !== window || !event.data || ($.inArray(event.origin, origins) === -1)) {
@@ -88,7 +68,12 @@ window.addEventListener("message", (event) => {
     }
 
     if (event.data.action === "isAddonInstalled") {
-        window.postMessage({action: "isAddonInstalledAnswer", isInstalled: true}, event.origin);
+        let version = chrome.runtime.getManifest().version
+        window.postMessage({
+            action: "isAddonInstalledAnswer",
+            version: version,
+            isInstalled: true
+        }, event.origin);
     }
 
     if (event.data.action === "showAds") {
@@ -205,5 +190,4 @@ window.addEventListener("message", (event) => {
             }, event.origin);
         });
     }
-
 });

@@ -1,4 +1,4 @@
-This extension is specifically developed for eBesucher.com and partner sites that are affiliated with ebesucher.com
+-This extension is specifically developed for eBesucher.com and partner sites that are affiliated with ebesucher.com
 
 With this extension users of the eBesucher surfbar and click ads can visit partner websites according to their area of interest and earn eBesucher points in return.
 

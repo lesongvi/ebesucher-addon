@@ -4,7 +4,7 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "manifest_version": 2,
-  "version": "1.0.43",
+  "version": "2.0.1",
   "author": "eBesucher",
   "homepage_url": "https://ebesucher.de",
   "icons": {
@@ -34,6 +34,6 @@
     "js": ["ads/iframe.js"],
     "all_frames": true
   }],
-  "permissions": ["storage", "tabs", "management", "*://ebesucher.de/*", "<all_urls>"],
-  "web_accessible_resources": ["lib/*"]
+  "permissions": ["storage", "tabs", "management", "*://ebesucher.de/*", "*://feat1.npk.ebesucher.de/*", "<all_urls>"],
+  "web_accessible_resources": ["lib/*", "addon/*"]
 }

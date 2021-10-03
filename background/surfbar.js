@@ -48,6 +48,8 @@ let Surfbar = function (type) {
     this.customAction = null;
 
     this.hasExecutedCustomAction = false;
+
+    this.eigenverdienst = 0;
 };
 
 Surfbar.prototype = {

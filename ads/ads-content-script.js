@@ -3,6 +3,18 @@ let surfbar = null;
 let countdownIsRunning = document.visibilityState === "visible";
 
 let jackpot = new Jackpot();
+let component = null
+let componentShadow = null
+let progress = null
+let progressCount = null
+let startProgress = null
+let progressBarColor = null
+let gradientStart = null
+let gradientEnd = null
+let gradientDiff = null
+
+let oldversion = false
+let initoldversion = false
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.from === "background" && request.action === "initAdsBox") {
@@ -64,6 +76,76 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 
+function addShadowEvents(surfbar) {
+    componentShadow = component.shadowRoot
+    let pauseButton = componentShadow.querySelector('.button')
+    let reportButton = componentShadow.querySelector('.fa-exclamation')
+    progress = componentShadow.querySelector('.progress')
+    progressCount = componentShadow.querySelector('.progress-count')
+    progressBarColor = componentShadow.querySelector('.progress-bar-color')
+    componentShadow.querySelector('.btp-points').textContent = surfbar.params.eigenverdienst + " BTP"
+    startProgress = surfbar.timeLeft - 1
+
+    gradientStart = convertRgbToJson('--gradientStart')
+    gradientEnd = convertRgbToJson('--gradientEnd')
+    gradientDiff = granientDifferance(gradientStart, gradientEnd, startProgress)
+    gradientEnd = Object.assign(gradientEnd, gradientStart)
+
+    reportButton.addEventListener('click', () => {
+        pauseCountdown();
+
+        chrome.runtime.sendMessage({from: "ads-view", action: "reportUrl", surfbar: surfbar});
+    })
+
+    pauseButton.addEventListener('click', () => {
+        if (countdownIsRunning) {
+            pauseCountdown();
+        } else {
+            continueCountdown(surfbar);
+        }
+    })
+}
+
+function granientDifferance(start, end, progress) {
+    return {
+        red: (end.red - start.red) / progress,
+        green: (end.green - start.green) / progress,
+        blue: (end.blue - start.blue) / progress
+    }
+}
+
+function convertRgbToJson(color) {
+    let css = getComputedStyle(component).getPropertyValue(color);
+
+    const pattern = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/
+    const rgb = css.match(pattern)
+
+    return {
+        red: parseFloat(rgb[1]),
+        green: parseFloat(rgb[2]),
+        blue: parseFloat(rgb[3])
+    }
+}
+
+function newGradientColor(end, diff) {
+    return {
+        red: parseFloat((end.red + diff.red).toFixed(2)),
+        green: parseFloat((end.green + diff.green).toFixed(2)),
+        blue: parseFloat((end.blue + diff.blue).toFixed(2))
+    }
+}
+
+function moveProgressBar(time, start, end, diff) {
+    let progressMoveTo = (100 - ((time / startProgress) * 100)).toFixed(2)
+    gradientEnd = end = newGradientColor(end, diff)
+
+    progressBarColor.style.background = `linear-gradient(135deg, rgb(${start.red}, ${start.green}, ${start.blue}), rgb(${end.red}, ${end.green}, ${end.blue}))`
+    progressCount.textContent = surfbar.timeLeft + "s"
+    progress.style.transitionDuration = 1 + "s"
+    progress.style.transitionTimingFunction = "linear"
+    progress.style.width = progressMoveTo + "%"
+}
+
 function initClickListener(surfbar) {
     $("#ao-btn-report").click(function () {
         pauseCountdown();
@@ -84,22 +166,42 @@ function insertAdsBox(surfbar) {
     let interval = setInterval(timer, 1000);
     let tries = 0;
 
+    const addonFrameCss = "\
+        position: fixed;\
+        top: 0;\
+        left: 0;\
+        right: 0;\
+        z-index: 2147483647;\
+        ";
+
     function timer() {
+        let displayHtml
+        if (surfbar.displayTime > 15) {
+            displayHtml =
+                '<link href="' + chrome.extension.getURL("lib/css/font-awesome.min.css") + '" rel="stylesheet">' +
+                '<link href="' + chrome.extension.getURL("addon/css/addon.css") + '" rel="stylesheet">' +
+                '<script type="module" src="' + chrome.extension.getURL("addon/js/surfbarComponent.js") + '"></script>' +
+                surfbar.displayHtml
+        } else {
+            displayHtml =
+                '<link href="' + chrome.extension.getURL("addon/css/addon.css") + '" rel="stylesheet">' +
+                '<link href="' + chrome.extension.getURL("lib/css/font-awesome.min.css") + '" rel="stylesheet">' +
+                surfbar.displayHtml
+        }
         let div = $('<div/>', {
             id: surfbar.surfbarId,
-            style: surfbar.frameCss,
-            html: '<link href="' + chrome.extension.getURL("lib/css/font-awesome.min.css") + '" rel="stylesheet">' + surfbar.displayHtml
+            style: addonFrameCss,
+            html: displayHtml
         });
         $("html").append(div);
 
-        initClickListener(surfbar);
+        initClickListener(surfbar)
         acceptCookieConsent();
 
         let surfbarExists = $("#" + surfbar.surfbarId).length !== 0;
         if (tries > 10 || surfbarExists) {
             clearInterval(interval);
         }
-
         tries++;
     }
 
@@ -164,12 +266,22 @@ function updateAd(surfbar) {
 }
 
 function updateView(surfbar) {
-    $("#ao-countdown").html(surfbar.timeLeft <= 0 ? 0 : surfbar.timeLeft);
+    if ($("#ao-btn-pause")) oldversion = false
 
-    if (surfbar.earnedTaskPoints > 0) {
-        let totalEarnedCredits = surfbar.params.earnableCreditsNumber + surfbar.earnedTaskPoints;
-
-        $("#ao-points").text(totalEarnedCredits.toLocaleString('de-DE', {minimumFractionDigits: 2}) + " BTP");
+    if (oldversion) {
+        $("#ao-countdown").html(surfbar.timeLeft <= 0 ? 0 : surfbar.timeLeft);
+        if (surfbar.earnedTaskPoints > 0) {
+            let totalEarnedCredits = surfbar.params.earnableCreditsNumber + surfbar.earnedTaskPoints;
+            $("#ao-points").text(totalEarnedCredits.toLocaleString('de-DE', {minimumFractionDigits: 2}) + " BTP");
+        }
+    } else {
+        if (component == null) {
+            component = document.querySelector('#addon-surfbar')
+        } else if (componentShadow == null) {
+            addShadowEvents(surfbar)
+        } else if (surfbar.timeLeft > 0) {
+            moveProgressBar(surfbar.timeLeft - 1, gradientStart, gradientEnd, gradientDiff)
+        }
     }
 }
 
@@ -243,11 +355,9 @@ async function handleCustomAction(surfbarLocal) {
             url.click();
         });
     }
-
 }
 
 $(document).ready(function () {
-
     if (!containsCurrentHostname("ebesucher")) {
 
         chrome.runtime.sendMessage({action: "getFilteredClickAdsTabs"}, function (response) {
@@ -273,5 +383,4 @@ $(document).ready(function () {
             }
         });
     }
-
 });
